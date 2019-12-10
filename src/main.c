@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
     while (1)
     {
-        print_prompt();
+        //print_prompt();
         read_input(input_buffer);
 
         if (strcmp(input_buffer->buffer, "exit") == 0)
@@ -30,6 +30,16 @@ int main(int argc, char **argv)
         else if (result == PREPARE_SYNTAX_ERROR)
         {
             printf("Syntax error. Could not parse statement.\n");
+            continue;
+        }
+        else if (result == PREPARE_STRING_TOO_LONG)
+        {
+            printf("String is too long.\n");
+            continue;
+        }
+        else if (result == PREPARE_NEGATIVE_ID)
+        {
+            printf("ID must be positive.\n");
             continue;
         }
         else
