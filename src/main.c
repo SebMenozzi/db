@@ -7,7 +7,14 @@
 
 int main(int argc, char **argv)
 {
-    struct table *table = new_table();
+    if (argc < 2)
+    {
+        printf("Must supply a database filename.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* filename = argv[1];
+    struct table *table = db_open(filename);
 
     struct input_buffer* input_buffer = new_input_buffer();
 
@@ -17,7 +24,11 @@ int main(int argc, char **argv)
         read_input(input_buffer);
 
         if (strcmp(input_buffer->buffer, "exit") == 0)
+        {
+            close_input_buffer(input_buffer);
+            db_close(table);
             exit(EXIT_SUCCESS);
+        }
 
         struct statement statement;
         enum prepare_result result = prepare_statement(input_buffer, &statement);

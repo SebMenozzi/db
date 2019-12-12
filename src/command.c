@@ -57,7 +57,7 @@ enum execute_result execute_insert(struct statement *statement, struct table *ta
 
     struct row *row_to_insert = &(statement->row_to_insert);
 
-    serialize_row(row_to_insert, row_slot(table, table->num_rows));
+    serialize_row(row_to_insert, get_row(table, table->num_rows));
     table->num_rows += 1;
 
     return EXECUTE_SUCCESS;
@@ -69,7 +69,7 @@ enum execute_result execute_select(struct statement *statement, struct table *ta
 
     for (uint32_t i = 0; i < table->num_rows; i++)
     {
-        deserialize_row(row_slot(table, i), &row);
+        deserialize_row(get_row(table, i), &row);
         print_row(&row);
     }
 

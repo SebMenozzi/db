@@ -1,7 +1,11 @@
 describe 'database' do
+    before do
+        `rm -rf test.db`
+    end
+
     def run_script(commands)
         raw_output = nil
-        IO.popen("../db", "r+") do |pipe|
+        IO.popen("../db test.db", "r+") do |pipe|
             commands.each do |command|
                 pipe.puts command
             end
@@ -14,18 +18,6 @@ describe 'database' do
         raw_output&.split("\n")
     end
 
-    it 'insert / retreive a row' do
-        result = run_script([
-            "insert 1 user1 person1@example.com",
-            "select",
-            "exit",
-        ])
-
-        expect(result).to match_array([
-            "(1, user1, person1@example.com)",
-        ])
-    end
-
     it 'print an error message when table is full' do
         script = (0..1300).map do |i|
             "insert #{i} user#{i} person#{i}@example.com"
@@ -36,6 +28,18 @@ describe 'database' do
 
         expect(result).to match_array([
           "Error: Table full.",
+        ])
+    end
+
+    it 'insert / retreive a row' do
+        result = run_script([
+            "insert 1 user1 person1@example.com",
+            "select",
+            "exit",
+        ])
+
+        expect(result).to match_array([
+            "(1, user1, person1@example.com)",
         ])
     end
 
@@ -106,6 +110,27 @@ describe 'database' do
 
         expect(result).to match_array([
             "ID must be positive.",
+        ])
+    end
+
+    it 'keeps data after closing connection' do
+        result1 = run_script([
+            "insert 1 user1 person1@example.com",
+            "select",
+            "exit",
+        ])
+
+        expect(result1).to match_array([
+            "(1, user1, person1@example.com)",
+        ])
+
+        result2 = run_script([
+            "select",
+            "exit",
+        ])
+
+        expect(result2).to match_array([
+            "(1, user1, person1@example.com)"
         ])
     end
 
